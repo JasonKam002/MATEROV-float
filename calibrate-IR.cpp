@@ -1,23 +1,33 @@
 #include <IRremote.hpp>
 
-// 1 - 0xBA45FF00
-// 2 - 0xB946FF00
-// 3 - 0xB847FF00
+// 1 - 3125149440
+// 2 - 3108437760
 
 #define IR_RECEIVE_PIN 7
+#define LED 6
+
+const uint32_t ON = 3125149440;
+const uint32_t OFF = 3108437760;
 
 void setup() {
   Serial.begin(9600);
+  pinMode(LED, OUTPUT);
   IrReceiver.begin(IR_RECEIVE_PIN, DISABLE_LED_FEEDBACK);  // <-- change this
-  Serial.println("Ready — point remote and press a button");
+  digitalWrite(LED, LOW);
 }
 
 void loop() {
   if (IrReceiver.decode()) {
-    Serial.print("Protocol: ");
-    Serial.println(IrReceiver.decodedIRData.protocol);
-    Serial.print("Code (HEX): 0x");
-    Serial.println(IrReceiver.decodedIRData.decodedRawData, HEX);
+    uint32_t code = IrReceiver.decodedIRData.decodedRawData;
+    Serial.println(code);
+
+    if (code == ON) {
+      digitalWrite(LED, HIGH);
+    }
+
+    else if (code == OFF) {
+      digitalWrite(LED, LOW);
+    }
     IrReceiver.resume();
   }
 }
